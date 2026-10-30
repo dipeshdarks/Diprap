@@ -1,0 +1,15 @@
+//#region node_modules/.nitro/vite/services/ssr/assets/download-Bm7VhDBp.js
+function downloadJson(filename, data) {
+	const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.href = url;
+	link.download = filename;
+	link.click();
+	URL.revokeObjectURL(url);
+}
+function slugify(value) {
+	return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "project";
+}
+//#endregion
+export { slugify as n, downloadJson as t };

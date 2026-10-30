@@ -1,0 +1,690 @@
+import { i as __toESM } from "../_runtime.mjs";
+import { f as isModelStale, g as syllableSummary, m as splitBars, u as analyzeText } from "./text-analysis-BV1TbPXT.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { b as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { L as require_jsx_runtime } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
+import { n as TriangleAlert } from "../_libs/lucide-react.mjs";
+import { d as formatDuration, f as formatSampleRate, i as useLabStore, r as useActiveProject, u as cn } from "./router-BoH-vfaJ.mjs";
+import { n as Button, r as Card, t as Badge } from "./Card-R8rfIlNa.mjs";
+import { t as EvidencePanel } from "./ProjectHeader-VU_w-hKi.mjs";
+import { t as EmptyState } from "./EmptyState-8DjM6I7n.mjs";
+import { a as ResponsiveContainer, i as Area, n as YAxis, o as Tooltip, r as XAxis, t as AreaChart } from "../_libs/recharts+[...].mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/FlowCadenceLab-CjwdMXeh.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+function ErrorState({ title = "Something went wrong", message, onRetry }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		role: "alert",
+		className: "flex flex-col items-start gap-3 border-danger/40 p-5",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, {
+				className: "size-5 text-danger",
+				"aria-hidden": true
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+				className: "text-base font-semibold text-fg",
+				children: title
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-sm text-muted",
+				children: message
+			}),
+			onRetry ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				variant: "secondary",
+				onClick: onRetry,
+				children: "Try again"
+			}) : null
+		]
+	});
+}
+var SECTION_COLOR = {
+	intro: "#22d3ee",
+	verse: "#8b5cf6",
+	hook: "#f2c94c",
+	bridge: "#f472b6",
+	outro: "#8a8a96"
+};
+function AudioPanel() {
+	const project = useActiveProject();
+	const audio = useLabStore((state) => state.audio);
+	const attachAudio = useLabStore((state) => state.attachAudio);
+	const clearAudio = useLabStore((state) => state.clearAudio);
+	const [error, setError] = (0, import_react.useState)(null);
+	const [progress, setProgress] = (0, import_react.useState)(0);
+	const [showBars, setShowBars] = (0, import_react.useState)(true);
+	const [showSections, setShowSections] = (0, import_react.useState)(true);
+	const canvasRef = (0, import_react.useRef)(null);
+	const attached = project && audio && audio.projectId === project.id ? audio : null;
+	const barCount = (0, import_react.useMemo)(() => project ? splitBars(project.lyrics).length : 0, [project]);
+	const sections = (0, import_react.useMemo)(() => {
+		if (!project) return [];
+		const estimate = analyzeText(project.lyrics, project.language);
+		if (project.model && project.model.structure.length > 0) return project.model.structure;
+		return estimate.structure;
+	}, [project]);
+	(0, import_react.useEffect)(() => {
+		const canvas = canvasRef.current;
+		if (!canvas || !attached) return;
+		const context = canvas.getContext("2d");
+		if (!context) return;
+		const styles = getComputedStyle(document.documentElement);
+		const accent = styles.getPropertyValue("--color-accent").trim() || "#8b5cf6";
+		const border = styles.getPropertyValue("--color-border").trim() || "#303038";
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const ratio = window.devicePixelRatio || 1;
+		canvas.width = Math.max(1, Math.floor(width * ratio));
+		canvas.height = Math.max(1, Math.floor(height * ratio));
+		context.setTransform(ratio, 0, 0, ratio, 0, 0);
+		context.clearRect(0, 0, width, height);
+		const mid = height / 2;
+		const slot = width / attached.peaks.length;
+		attached.peaks.forEach((peak, index) => {
+			const barHeight = Math.max(2, peak * (height - 8));
+			context.fillStyle = index / attached.peaks.length < progress ? accent : border;
+			context.fillRect(index * slot, mid - barHeight / 2, Math.max(1, slot - 1), barHeight);
+		});
+		if (showSections && barCount > 0) sections.forEach((section) => {
+			const startX = section.startIndex / barCount * width;
+			const endX = (section.endIndex + 1) / barCount * width;
+			context.fillStyle = `${SECTION_COLOR[section.type]}44`;
+			context.fillRect(startX, 0, Math.max(1, endX - startX), 6);
+		});
+		if (showBars && barCount > 0) {
+			context.strokeStyle = "#f5f5f466";
+			context.lineWidth = 1;
+			for (let bar = 1; bar < barCount; bar += 1) {
+				const x = bar / barCount * width;
+				context.beginPath();
+				context.moveTo(x, height - 8);
+				context.lineTo(x, height);
+				context.stroke();
+			}
+		}
+	}, [
+		attached,
+		progress,
+		showBars,
+		showSections,
+		barCount,
+		sections
+	]);
+	if (!project) return null;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		className: "space-y-4 p-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-wrap items-start justify-between gap-3",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					className: "text-base font-semibold text-fg",
+					children: "Audio"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-sm text-muted",
+					children: "Attach a file you have rights to. It stays in this browser session and is never uploaded."
+				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
+					className: "inline-flex min-h-11 cursor-pointer items-center rounded-md border border-border bg-raised px-4 text-sm text-fg",
+					children: ["Attach audio", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+						type: "file",
+						accept: "audio/*",
+						className: "sr-only",
+						suppressHydrationWarning: true,
+						onChange: (event) => {
+							const file = event.target.files?.[0];
+							event.target.value = "";
+							if (!file) return;
+							attachAudio(project.id, file).then((result) => {
+								setError(result.ok ? null : result.error);
+								setProgress(0);
+							});
+						}
+					})]
+				})]
+			}),
+			error ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ErrorState, {
+				title: "Audio was not attached",
+				message: error
+			}) : null,
+			attached ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-3",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex flex-wrap items-center justify-between gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-sm text-fg",
+							children: attached.fileName
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex flex-wrap gap-1.5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToggleChip, {
+								active: showSections,
+								onClick: () => setShowSections((value) => !value),
+								label: "Sections"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToggleChip, {
+								active: showBars,
+								onClick: () => setShowBars((value) => !value),
+								label: "Bar markers"
+							})]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("canvas", {
+						ref: canvasRef,
+						className: "h-24 w-full rounded-md bg-bg",
+						role: "img",
+						"aria-label": "Waveform measured from the attached file"
+					}),
+					barCount > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-xs text-muted",
+						children: "Markers are evenly spaced across the duration — an orientation aid, not a beat-matched transcription."
+					}) : null,
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("audio", {
+						src: attached.url,
+						controls: true,
+						className: "w-full",
+						onTimeUpdate: (event) => {
+							const element = event.currentTarget;
+							if (!element.duration) return;
+							setProgress(element.currentTime / element.duration);
+						}
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("dl", {
+						className: "grid gap-3 sm:grid-cols-3",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Stat, {
+								label: "Duration",
+								value: formatDuration(attached.duration),
+								note: "Measured"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Stat, {
+								label: "Sample rate",
+								value: formatSampleRate(attached.sampleRate),
+								note: "Measured"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Stat, {
+								label: "Tempo",
+								value: "Unavailable",
+								note: "No beat tracker"
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvidencePanel, {
+						evidenceType: "measured",
+						source: "Duration, sample rate, and the waveform come from decoding the file in this browser.",
+						uncertainty: "Bars are not aligned to the audio. Breaths, BPM, and mix notes were not measured."
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: "secondary",
+						onClick: clearAudio,
+						children: "Remove audio"
+					})
+				]
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvidencePanel, {
+				evidenceType: "unavailable",
+				source: "No audio is attached, so there is no waveform, duration, or tempo.",
+				uncertainty: "The lab will not draw a placeholder performance."
+			})
+		]
+	});
+}
+function ToggleChip({ active, onClick, label }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+		type: "button",
+		onClick,
+		"aria-pressed": active,
+		className: cn("inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-medium", active ? "border-accent bg-accent/15 text-accent" : "border-border bg-raised text-muted hover:text-fg"),
+		children: label
+	});
+}
+function Stat({ label, value, note }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "rounded-md border border-border bg-bg px-3 py-2",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("dt", {
+				className: "text-xs text-faint",
+				children: label
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("dd", {
+				className: "text-sm font-medium text-fg",
+				children: value
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-xs text-muted",
+				children: note
+			})
+		]
+	});
+}
+var SECTION_HUE = {
+	intro: "bg-cyan/40 text-cyan",
+	verse: "bg-accent/40 text-accent",
+	hook: "bg-gold/40 text-gold",
+	bridge: "bg-pink/40 text-pink",
+	outro: "bg-raised text-muted"
+};
+var SECTION_SHORT = {
+	intro: "Intro",
+	verse: "Verse",
+	hook: "Hook",
+	bridge: "Bridge",
+	outro: "Outro"
+};
+function FlowCadenceLab() {
+	const project = useActiveProject();
+	const selectedBar = useLabStore((state) => state.selectedBar);
+	const setSelectedBar = useLabStore((state) => state.setSelectedBar);
+	const estimate = (0, import_react.useMemo)(() => project ? analyzeText(project.lyrics, project.language) : null, [project]);
+	if (!project || !estimate || estimate.lines.length === 0) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmptyState, {
+		title: "Nothing to chart",
+		body: "Flow notes start from the lines you paste. Audio stays optional, and only then is anything measured.",
+		action: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+			asChild: true,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+				to: "/analyze",
+				search: { view: "lyrics" },
+				children: "Add lyrics"
+			})
+		})
+	});
+	const summary = syllableSummary(estimate);
+	const stale = project.model ? isModelStale(project.model.sourceLines, project.lyrics) : false;
+	const model = project.model && !stale ? project.model : null;
+	const sections = model && model.structure.length > 0 ? model.structure : estimate.structure;
+	const selected = estimate.lines[Math.min(selectedBar, estimate.lines.length - 1)] ?? estimate.lines[0];
+	const data = estimate.lines.map((line) => ({
+		bar: line.index + 1,
+		syllables: line.syllables ?? 0
+	}));
+	const chartable = estimate.lines.some((line) => line.syllables != null);
+	const pauseCount = estimate.lines.filter((line) => line.pauseNote).length;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "space-y-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+				className: "text-lg font-semibold text-fg",
+				children: "Flow and cadence"
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "text-sm text-muted",
+				children: "Charts below are text estimates. They are not a timeline of a performance."
+			})] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid gap-3 sm:grid-cols-2 xl:grid-cols-4",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Metric, {
+						label: "Written lines",
+						value: String(estimate.lines.length),
+						note: "Non-empty lines you pasted",
+						evidence: "estimated"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Metric, {
+						label: "Est. syllables",
+						value: summary ? String(summary.total) : "—",
+						note: summary ? `About ${summary.average.toFixed(1)} per counted line` : "Unavailable",
+						evidence: "estimated"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Metric, {
+						label: "Punctuation breaks",
+						value: String(pauseCount),
+						note: "Not timed breaths",
+						evidence: "estimated"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Metric, {
+						label: "BPM",
+						value: "—",
+						note: "Unavailable without beat tracking",
+						evidence: "none"
+					})
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid gap-4 xl:grid-cols-5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+					className: "p-4 xl:col-span-3",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mb-3 flex items-center justify-between gap-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+								className: "text-sm font-medium text-fg",
+								children: "Syllable density"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+								tone: "gold",
+								children: "Text estimate"
+							})]
+						}),
+						chartable ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "h-56",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ResponsiveContainer, {
+								width: "100%",
+								height: "100%",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AreaChart, {
+									data,
+									margin: {
+										top: 8,
+										right: 8,
+										left: 0,
+										bottom: 0
+									},
+									children: [
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(XAxis, {
+											dataKey: "bar",
+											stroke: "currentColor",
+											tick: {
+												fill: "currentColor",
+												fontSize: 12
+											}
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(YAxis, {
+											allowDecimals: false,
+											stroke: "currentColor",
+											tick: {
+												fill: "currentColor",
+												fontSize: 12
+											},
+											width: 32
+										}),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Tooltip, { content: ({ active, payload, label }) => active && payload && payload.length ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+											className: "rounded-md border border-border bg-raised px-3 py-2 text-xs text-fg",
+											children: [
+												"Bar ",
+												label,
+												": ",
+												payload[0]?.value,
+												" estimated syllables"
+											]
+										}) : null }),
+										/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Area, {
+											type: "monotone",
+											dataKey: "syllables",
+											stroke: "#8b5cf6",
+											fill: "#8b5cf6",
+											fillOpacity: .2,
+											strokeWidth: 2
+										})
+									]
+								})
+							})
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-sm text-muted",
+							children: "Syllable estimates need Latin-script words. This excerpt does not have enough of them."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							className: "mt-4 space-y-2 text-sm text-muted",
+							children: [estimate.patterns.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+								"Stanza patterns:",
+								" ",
+								estimate.patterns.map((pattern) => `${pattern.label} (lines ${pattern.start + 1}–${pattern.end + 1})`).join(", "),
+								"."
+							] }) : null, estimate.observations.map((note) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: note }, note))]
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+					className: "space-y-3 p-4 xl:col-span-2",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							className: "text-sm font-medium text-fg",
+							children: "Selected bar"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
+							className: "block text-sm text-muted",
+							htmlFor: "flow-bar",
+							children: ["Bar", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("select", {
+								id: "flow-bar",
+								className: "mt-1 h-11 w-full rounded-md border border-border bg-bg px-2 text-fg",
+								value: selected?.index ?? 0,
+								onChange: (event) => setSelectedBar(Number(event.target.value)),
+								children: estimate.lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("option", {
+									value: line.index,
+									children: [
+										line.index + 1,
+										". ",
+										line.text.slice(0, 48)
+									]
+								}, line.index))
+							})]
+						}),
+						selected ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-sm text-fg",
+								children: selected.text
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-sm text-muted",
+								children: selected.syllableBasis
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-sm text-muted",
+								children: selected.pauseNote ?? "No punctuation break on this line. That does not mean the performer takes no breath."
+							})
+						] }) : null,
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+							className: "text-sm font-medium text-fg",
+							children: "Cadence notes"
+						}), model ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							className: "mt-2 list-disc space-y-1 pl-4 text-sm text-muted",
+							children: [[...model.cadenceNotes, ...model.flowNotes].map((note) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: note }, note)), model.cadenceNotes.length + model.flowNotes.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "The model did not add cadence notes." }) : null]
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "mt-2 text-sm text-muted",
+							children: "Qualitative delivery notes appear here after Analyze. They will still not include a BPM."
+						})] }),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvidencePanel, {
+							evidenceType: model ? "interpretive" : "user_provided",
+							source: model ? "Numbers in the chart are still text estimates. Sentences from the model are interpretations, not measurements." : estimate.disclaimer,
+							uncertainty: "No vocal timing was captured."
+						})
+					]
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "p-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mb-3 flex flex-wrap items-center justify-between gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+						className: "text-sm font-medium text-fg",
+						children: "Structure timeline"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+						tone: model ? "accent" : "gold",
+						children: model && model.structure.length > 0 ? "Model reading" : "Text estimate"
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(StructureTimeline, {
+					sections,
+					total: estimate.lines.length,
+					selected: selected?.index ?? 0,
+					onSelect: setSelectedBar
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "p-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mb-3 flex flex-wrap items-center justify-between gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+						className: "text-sm font-medium text-fg",
+						children: "Cadence map"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+						tone: "gold",
+						children: "Text estimate"
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CadenceMap, {
+					estimate,
+					sections,
+					selected: selected?.index ?? 0,
+					onSelect: setSelectedBar
+				})]
+			}),
+			model && model.flowMap.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+				className: "p-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mb-3 flex items-center justify-between gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+						className: "text-sm font-medium text-fg",
+						children: "Flow map"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+						tone: "accent",
+						children: "Model reading"
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+					className: "grid gap-3 sm:grid-cols-2",
+					children: model.flowMap.map((entry) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+						className: "rounded-md border border-border bg-bg p-3",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-sm font-medium text-fg",
+							children: entry.section
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("dl", {
+							className: "mt-2 space-y-1 text-sm text-muted",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("dt", {
+									className: "inline font-medium text-fg",
+									children: "Flow: "
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("dd", {
+									className: "inline",
+									children: entry.flowStyle
+								})] }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("dt", {
+									className: "inline font-medium text-fg",
+									children: "Rhythm: "
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("dd", {
+									className: "inline",
+									children: entry.rhythm
+								})] }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("dt", {
+									className: "inline font-medium text-fg",
+									children: "Rhyme technique: "
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("dd", {
+									className: "inline",
+									children: entry.rhymeTechnique
+								})] }),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("dt", {
+									className: "inline font-medium text-fg",
+									children: "Effect: "
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("dd", {
+									className: "inline",
+									children: entry.effect
+								})] })
+							]
+						})]
+					}, `${entry.section}-${entry.flowStyle}`))
+				})]
+			}) : null,
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AudioPanel, {})
+		]
+	});
+}
+function StructureTimeline({ sections, total, selected, onSelect }) {
+	if (sections.length === 0) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+		className: "text-sm text-muted",
+		children: "No structure was detected. Paste more lines or run Analyze for a model reading."
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+		className: "space-y-2",
+		children: sections.map((section) => {
+			const length = section.endIndex - section.startIndex + 1;
+			const width = `${Math.max(4, length / total * 100)}%`;
+			const active = selected >= section.startIndex && selected <= section.endIndex;
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+				type: "button",
+				onClick: () => onSelect(section.startIndex),
+				className: cn("flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left", active ? "border-accent bg-accent/10" : "border-border hover:bg-raised"),
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: cn("rounded-full px-2 py-0.5 text-xs font-medium", SECTION_HUE[section.type]),
+						children: SECTION_SHORT[section.type]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "min-w-0 flex-1",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "block truncate text-sm text-fg",
+							children: section.label
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+							className: "block text-xs text-muted",
+							children: [
+								"Lines ",
+								section.startIndex + 1,
+								"–",
+								section.endIndex + 1,
+								section.note ? ` · ${section.note}` : ""
+							]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "hidden h-2 shrink-0 overflow-hidden rounded-full bg-raised sm:block",
+						style: { width: "20%" },
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: cn("block h-full rounded-full", SECTION_HUE[section.type].split(" ")[0]),
+							style: { width }
+						})
+					})
+				]
+			}) }, `${section.label}-${section.startIndex}`);
+		})
+	});
+}
+function CadenceMap({ estimate, sections, selected, onSelect }) {
+	const maxSyllables = Math.max(1, ...estimate.lines.map((line) => line.syllables ?? 0));
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+		className: "space-y-1.5",
+		children: [estimate.lines.map((line) => {
+			const section = sections.find((item) => line.index >= item.startIndex && line.index <= item.endIndex);
+			const hue = section ? SECTION_HUE[section.type].split(" ")[0] : "bg-accent";
+			const width = `${Math.max(4, (line.syllables ?? 0) / maxSyllables * 100)}%`;
+			const active = line.index === selected;
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+				type: "button",
+				onClick: () => onSelect(line.index),
+				className: cn("flex w-full items-center gap-3 rounded-md px-2 py-1 text-left", active ? "bg-accent/10 ring-1 ring-accent ring-inset" : "hover:bg-raised"),
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "w-6 shrink-0 text-right font-mono text-xs text-muted",
+						children: line.index + 1
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "h-3 flex-1 overflow-hidden rounded-full bg-raised",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: cn("block h-full rounded-full", hue),
+							style: { width }
+						})
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "w-14 shrink-0 text-right font-mono text-xs text-muted",
+						children: [line.syllables ?? "—", " syl"]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: cn("w-12 shrink-0 rounded-full px-1.5 py-0.5 text-center text-[10px] font-medium", line.pauseNote ? "bg-raised text-gold" : "bg-bg text-faint"),
+						children: line.pauseNote ? "break" : "—"
+					})
+				]
+			}) }, line.index);
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+			className: "pt-2 text-xs text-muted",
+			children: "Phrase color follows the section. “break” marks a punctuation pause in the text — not a measured breath."
+		})]
+	});
+}
+function Metric({ label, value, note, evidence }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+		className: "p-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center justify-between gap-2",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-xs text-faint",
+					children: label
+				}), evidence === "estimated" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+					tone: "gold",
+					children: "Estimated"
+				}) : evidence === "measured" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+					tone: "ok",
+					children: "Measured"
+				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+					tone: "muted",
+					children: "Unavailable"
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "mt-1 font-mono text-2xl text-fg tabular-nums",
+				children: value
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "mt-1 text-xs text-muted",
+				children: note
+			})
+		]
+	});
+}
+//#endregion
+export { ErrorState as n, FlowCadenceLab as r, AudioPanel as t };

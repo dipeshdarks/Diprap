@@ -1,0 +1,180 @@
+import { i as __toESM } from "../_runtime.mjs";
+import { f as isModelStale, h as splitHighlight, u as analyzeText } from "./text-analysis-BV1TbPXT.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { b as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { L as require_jsx_runtime } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
+import { i as useLabStore, r as useActiveProject } from "./router-BoH-vfaJ.mjs";
+import { n as Button, r as Card, t as Badge } from "./Card-R8rfIlNa.mjs";
+import { t as EvidencePanel } from "./ProjectHeader-VU_w-hKi.mjs";
+import { t as EmptyState } from "./EmptyState-8DjM6I7n.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/RhymeLab-r3fdYyd9.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+function LyricText({ text, words }) {
+	const parts = splitHighlight(text, words);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+		className: "text-sm leading-6 text-fg",
+		children: parts.map((part, index) => part.hit ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("mark", {
+			className: "rounded-sm bg-gold/20 px-0.5 text-gold",
+			children: part.text
+		}, `${part.text}-${index}`) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: part.text }, `${part.text}-${index}`))
+	});
+}
+function RhymeLab() {
+	const project = useActiveProject();
+	const setSelectedBar = useLabStore((state) => state.setSelectedBar);
+	const estimate = (0, import_react.useMemo)(() => project ? analyzeText(project.lyrics, project.language) : null, [project]);
+	const stale = project?.model ? isModelStale(project.model.sourceLines, project.lyrics) : false;
+	const modelReady = Boolean(project?.model && !stale && project.model.rhymes.length > 0);
+	const [source, setSource] = (0, import_react.useState)(modelReady ? "model" : "spelling");
+	const activeSource = source === "model" && modelReady ? "model" : "spelling";
+	const [selectedId, setSelectedId] = (0, import_react.useState)(null);
+	if (!project || !estimate) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmptyState, {
+		title: "No lyrics to compare",
+		body: "Rhyme groups are built from a project. Paste lines you have the right to study.",
+		action: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+			asChild: true,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+				to: "/analyze",
+				search: { view: "lyrics" },
+				children: "Add lyrics"
+			})
+		})
+	});
+	const spellingGroups = [...estimate.endGroups, ...estimate.internalGroups];
+	const modelGroups = !stale && project.model ? project.model.rhymes : [];
+	const groups = activeSource === "model" ? modelGroups : spellingGroups;
+	const current = groups.find((group) => group.id === selectedId) ?? groups[0] ?? null;
+	const words = current ? current.members.map((member) => member.word) : [];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "space-y-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-wrap items-center justify-between gap-3",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					className: "text-lg font-semibold text-fg",
+					children: "Rhyme lab"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-sm text-muted",
+					children: "Spelling groups are calculated here. Phonetic groups appear only after a model reading, and they stay guesses."
+				})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex gap-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: activeSource === "spelling" ? "primary" : "secondary",
+						onClick: () => setSource("spelling"),
+						"aria-pressed": activeSource === "spelling",
+						children: "Spelling pass"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						variant: activeSource === "model" ? "primary" : "secondary",
+						onClick: () => setSource("model"),
+						disabled: !modelReady,
+						"aria-pressed": activeSource === "model",
+						children: "Model reading"
+					})]
+				})]
+			}),
+			stale ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "rounded-md border border-gold/40 bg-gold/10 px-3 py-2 text-sm text-gold",
+				children: "The model rhyme list is hidden because the lyrics changed after that reading."
+			}) : null,
+			groups.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(EmptyState, {
+				title: activeSource === "model" ? "No rhyme groups in that reading" : "No shared endings yet",
+				body: activeSource === "model" ? "The model did not return rhyme groups whose words actually appear in the lines." : "The spelling pass only groups Latin endings that repeat, or in-line pairs that share an ending. It will not invent slant rhymes."
+			}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "grid gap-4 xl:grid-cols-5",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
+					className: "space-y-2 p-3 xl:col-span-2",
+					children: groups.map((group) => {
+						const active = group.id === current?.id;
+						const label = group.type;
+						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+							type: "button",
+							onClick: () => setSelectedId(group.id),
+							"aria-pressed": active,
+							className: `w-full rounded-md border px-3 py-3 text-left ${active ? "border-accent bg-accent/10" : "border-border hover:bg-raised"}`,
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex flex-wrap items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Badge, {
+									tone: activeSource === "model" ? "accent" : "gold",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-mono font-semibold",
+										children: group.letter
+									}), label]
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "font-mono text-xs text-muted",
+									children: "sound" in group ? group.sound : group.key
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "mt-2 text-sm text-fg",
+								children: group.members.map((member) => member.word).join(" · ")
+							})]
+						}, group.id);
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "space-y-4 xl:col-span-3",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
+						className: "divide-y divide-border",
+						children: estimate.lines.map((line) => {
+							const inGroup = current?.members.some((member) => member.barIndex === line.index) ?? false;
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								onClick: () => setSelectedBar(line.index),
+								className: `flex w-full gap-3 px-4 py-3 text-left ${inGroup ? "bg-accent/10" : "hover:bg-raised"}`,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "font-mono text-xs text-faint",
+									children: line.index + 1
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LyricText, {
+									text: line.text,
+									words: inGroup ? words : []
+								})]
+							}, line.index);
+						})
+					}), current ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+						className: "space-y-3 p-4",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h3", {
+								className: "text-base font-semibold text-fg",
+								children: [
+									"Group ",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-mono",
+										children: current.letter
+									}),
+									" — ",
+									current.type
+								]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+								className: "space-y-2 text-sm text-muted",
+								children: current.members.map((member) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										className: "text-fg",
+										children: [
+											"Bar ",
+											member.barIndex + 1,
+											":"
+										]
+									}),
+									" ",
+									member.word,
+									"note" in member && member.note ? ` — ${member.note}` : ""
+								] }, `${member.barIndex}-${member.word}`))
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								className: "text-sm text-muted",
+								children: current.explanation
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(EvidencePanel, {
+								evidenceType: activeSource === "model" ? "model_estimated" : "user_provided",
+								source: activeSource === "model" ? "Sound labels are the model’s phonetic guess. Words were kept only when they appear in your line." : "Grouped by matching Latin letters. Pronunciation was not checked.",
+								uncertainty: activeSource === "model" ? "A guessed sound can be wrong, especially across accents." : "Shared spelling is not the same thing as a rhyme."
+							})
+						]
+					}) : null]
+				})]
+			})
+		]
+	});
+}
+//#endregion
+export { RhymeLab as n, LyricText as t };

@@ -1,0 +1,1 @@
+import{T as e}from"./analysis-BvFdgLwF.js";import{t}from"./PracticeLab-BsXiZE09.js";import{t as n}from"./ProjectFrame-DOUQd96C.js";var r=e(),i=function(){return(0,r.jsx)(n,{children:(0,r.jsx)(t,{})})};export{i as component};

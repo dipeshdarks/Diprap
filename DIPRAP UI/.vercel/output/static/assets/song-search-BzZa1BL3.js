@@ -1,0 +1,1 @@
+var e={provider:`genius`,configured:!1,reason:`No Genius API token is configured. DIPRAP will not invent search results, artwork, or lyrics.`};function t(){return e}function n(e){let t=e.trim();return t?`https://genius.com/search?q=${encodeURIComponent(t)}`:`https://genius.com/`}export{t as n,n as t};

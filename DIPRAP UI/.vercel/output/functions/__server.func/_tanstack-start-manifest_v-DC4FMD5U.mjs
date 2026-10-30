@@ -1,0 +1,111 @@
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-DC4FMD5U.js
+var tsrStartManifest = () => ({ routes: {
+	__root__: {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/__root.tsx",
+		children: [
+			"/",
+			"/analyze",
+			"/flow-lab",
+			"/practice",
+			"/projects",
+			"/rhyme-lab",
+			"/search",
+			"/settings"
+		],
+		preloads: [
+			"/assets/index-DbKxVpUk.js",
+			"/assets/analysis-BvFdgLwF.js",
+			"/assets/es2015-CVuK1w8v.js",
+			"/assets/link-Dgq7pD8y.js",
+			"/assets/useNavigate-B5tBM04r.js",
+			"/assets/createLucideIcon-z1oyurqU.js"
+		],
+		scripts: [{ attrs: {
+			type: "module",
+			async: !0,
+			src: "/assets/index-DbKxVpUk.js"
+		} }]
+	},
+	"/": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/index.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/routes-DwZeR_oe.js",
+			"/assets/plus-ByCzMEqG.js",
+			"/assets/Card-BptbjIsY.js"
+		]
+	},
+	"/analyze": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/analyze.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/analyze-BWV_mxh6.js",
+			"/assets/ProjectHeader-B6WH4f78.js",
+			"/assets/Card-BptbjIsY.js",
+			"/assets/FlowCadenceLab-BA-b2bPl.js",
+			"/assets/RhymeLab-BtvvFUoR.js",
+			"/assets/EmptyState-Cq72LsZv.js",
+			"/assets/PracticeLab-BsXiZE09.js"
+		]
+	},
+	"/flow-lab": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/flow-lab.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/flow-lab-DOcAMKne.js",
+			"/assets/FlowCadenceLab-BA-b2bPl.js",
+			"/assets/ProjectFrame-DOUQd96C.js"
+		]
+	},
+	"/practice": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/practice.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/practice-CmTas8cY.js",
+			"/assets/PracticeLab-BsXiZE09.js",
+			"/assets/ProjectFrame-DOUQd96C.js"
+		]
+	},
+	"/projects": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/projects.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/projects-HX5F9y86.js",
+			"/assets/Card-BptbjIsY.js",
+			"/assets/EmptyState-Cq72LsZv.js",
+			"/assets/ConfirmDialog-BfBvWdra.js"
+		]
+	},
+	"/rhyme-lab": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/rhyme-lab.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/rhyme-lab-DUFStjGU.js",
+			"/assets/RhymeLab-BtvvFUoR.js",
+			"/assets/ProjectFrame-DOUQd96C.js"
+		]
+	},
+	"/search": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/search.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/search-BCC-46qT.js",
+			"/assets/Card-BptbjIsY.js",
+			"/assets/EmptyState-Cq72LsZv.js",
+			"/assets/song-search-BzZa1BL3.js"
+		]
+	},
+	"/settings": {
+		filePath: "C:/Users/Lenovo/Downloads/RAP LYRICS & SONG/DIPRAP UI/src/routes/settings.tsx",
+		children: void 0,
+		preloads: [
+			"/assets/settings-Dp2CSslM.js",
+			"/assets/Card-BptbjIsY.js",
+			"/assets/download-C9IR7am8.js",
+			"/assets/ConfirmDialog-BfBvWdra.js",
+			"/assets/song-search-BzZa1BL3.js"
+		]
+	}
+} });
+//#endregion
+export { tsrStartManifest };

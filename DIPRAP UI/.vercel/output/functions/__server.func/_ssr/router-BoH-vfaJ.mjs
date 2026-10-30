@@ -1,0 +1,1841 @@
+import { i as __toESM } from "../_runtime.mjs";
+import { i as MAX_LYRICS, m as splitBars, t as ANALYSIS_VIEWS } from "./text-analysis-BV1TbPXT.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { S as useRouter, _ as lazyRouteComponent, b as Link, d as Scripts, f as HeadContent, g as Outlet, h as createRouter, p as useRouterState, v as createFileRoute, x as useNavigate, y as createRootRoute } from "../_libs/@tanstack/react-router+[...].mjs";
+import { L as require_jsx_runtime, d as DialogContent, f as DialogDescription, g as DialogTrigger, h as DialogTitle, l as Dialog, m as DialogPortal, p as DialogOverlay, u as DialogClose } from "../_libs/@radix-ui/react-alert-dialog+[...].mjs";
+import { n as TSS_SERVER_FUNCTION, r as getServerFnById, t as createServerFn } from "./ssr.mjs";
+import { a as object, i as number, n as array, o as string, r as literal, s as union, t as _enum } from "../_libs/zod.mjs";
+import { C as Activity, b as BookOpen, c as PanelLeft, d as GraduationCap, g as CircleHelp, i as Search, l as Menu, n as TriangleAlert, o as Rows3, p as FolderOpen, r as Settings, t as X, u as House, v as ChevronLeft, x as AudioLines } from "../_libs/lucide-react.mjs";
+import { t as Toaster } from "../_libs/sonner.mjs";
+import { n as clsx } from "../_libs/class-variance-authority+clsx.mjs";
+import { t as twMerge } from "../_libs/tailwind-merge.mjs";
+import { n as persist, r as create, t as createJSONStorage } from "../_libs/zustand.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/router-BoH-vfaJ.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+var __defProp = Object.defineProperty;
+var __exportAll = (all, no_symbols) => {
+	let target = {};
+	for (var name in all) __defProp(target, name, {
+		get: all[name],
+		enumerable: true
+	});
+	if (!no_symbols) __defProp(target, Symbol.toStringTag, { value: "Module" });
+	return target;
+};
+var FALLBACK_MESSAGE = "An unexpected error occurred. Try reloading the page.";
+function errorMessage(error) {
+	if (error instanceof Error && error.message) return error.message;
+	if (typeof error === "string" && error) return error;
+	return FALLBACK_MESSAGE;
+}
+function AppErrorComponent({ error }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("main", {
+		className: "flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+				className: "text-red-500",
+				"aria-hidden": "true",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, {
+					className: "size-10",
+					strokeWidth: 2
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+				className: "text-lg font-semibold",
+				children: "Something went wrong"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				className: "max-w-md text-sm break-words text-zinc-500 dark:text-zinc-400",
+				children: errorMessage(error)
+			})
+		]
+	});
+}
+/**
+* Path-based preview hosts serve the dev server under `/{port_id}/` and strip
+* that prefix before forwarding, so SSR sees `/` while the browser URL keeps the
+* prefix. TanStack Start resets `basepath` on hydration, so a `rewrite` keeps
+* client routing and generated links aligned with the public URL.
+*/
+var PATH_BASED_PREVIEW_HOSTS = /* @__PURE__ */ new Set([
+	"preview.grok.genai.mil",
+	"preview.grok.mil",
+	"preview.grokgsac.com"
+]);
+var PORT_ID_PREFIX = /^\/hds-[a-z0-9]+-\d+-[a-z0-9]+(?=\/|$)/i;
+function previewPathPrefix(hostname, pathname) {
+	if (!PATH_BASED_PREVIEW_HOSTS.has(hostname.toLowerCase())) return void 0;
+	return PORT_ID_PREFIX.exec(pathname)?.[0];
+}
+function prefixRewrite(prefix) {
+	return {
+		input: ({ url }) => {
+			if (url.pathname === prefix) url.pathname = "/";
+			else if (url.pathname.startsWith(`${prefix}/`)) url.pathname = url.pathname.slice(prefix.length);
+			return url;
+		},
+		output: ({ url }) => {
+			url.pathname = `${prefix}${url.pathname}`;
+			return url;
+		}
+	};
+}
+function previewPathRewrite() {
+	if (typeof window === "undefined") return void 0;
+	const prefix = previewPathPrefix(window.location.hostname, window.location.pathname);
+	return prefix ? prefixRewrite(prefix) : void 0;
+}
+function initials(name) {
+	const parts = name.trim().split(/\s+/).filter(Boolean);
+	if (parts.length === 0) return "DP";
+	if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+	return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+}
+function formatDuration(seconds) {
+	if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+	const total = Math.round(seconds);
+	return `${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, "0")}`;
+}
+function formatSampleRate(rate) {
+	if (!Number.isFinite(rate)) return "Unavailable";
+	return `${(rate / 1e3).toFixed(1)} kHz`;
+}
+function cn(...inputs) {
+	return twMerge(clsx(inputs));
+}
+var createSsrRpc = (functionId) => {
+	const url = "/_serverFn/" + functionId;
+	const serverFnMeta = { id: functionId };
+	const fn = async (...args) => {
+		return (await getServerFnById(functionId, { origin: "server" }))(...args);
+	};
+	return Object.assign(fn, {
+		url,
+		serverFnMeta,
+		[TSS_SERVER_FUNCTION]: true
+	});
+};
+var inputSchema = object({
+	lyrics: string().min(1).max(8e3),
+	language: _enum([
+		"English",
+		"Hindi",
+		"Hinglish",
+		"Other"
+	]),
+	title: string().max(120),
+	artist: string().max(120),
+	modules: array(_enum([
+		"meaning",
+		"wordplay",
+		"rhyme",
+		"narrative",
+		"flow",
+		"story",
+		"scorecard"
+	])).min(1).max(7)
+});
+var getAiAvailability = createServerFn({ method: "GET" }).handler(createSsrRpc("071eba362a998aa4f2f88f6c4303e6f3d6e0011834cd27dcb9a995bc484ad669"));
+var analyzeLyrics = createServerFn({ method: "POST" }).validator((input) => inputSchema.parse(input)).handler(createSsrRpc("9c2a23bc4d37c5daab5858e46b9ed1e7608ef8bfe5ce42c075ab49bec519a756"));
+var DEMO_LYRICS = `I walk through the city, dreams in my pocket
+Concrete streets, but my mind's in the sky
+Every step a lesson, I keep it real
+From the struggle to the stage, it's a journey
+Same soul, different chapter, still the same me
+They see the hustle, but they don't know the pain
+Behind the smile, there's a story in the rain
+I'm not just chasing money, I'm chasing freedom
+A better tomorrow, that's the mission
+Same city, new dreams, different season
+Still the same kid, just a bigger reason
+No map, just a vision, I'm on it`;
+/**
+* Saved sample reading for the Street Dreams demo — written by hand as an
+* example of the model's output shape, NOT a live model call. The UI labels
+* it as a bundled sample so nothing here can be mistaken for fresh analysis.
+*/
+var DEMO_MODEL_READING = {
+	generatedAt: "2026-01-01T00:00:00.000Z",
+	model: "bundled sample reading",
+	disclaimer: "Saved sample reading bundled with the lab demo — not a live model call. It is still an interpretation of the demo text, not a fact, not a phonetic transcription, and not a measurement of a performance.",
+	overallMeaning: "A short motivational verse about carrying ambition through ordinary city life: keep walking, keep the same self while the chapters change, and trade the chase for money into the chase for freedom.",
+	story: {
+		centralMessage: "Ambition survives inside everyday city life — growth changes the reasons, not the person.",
+		narrativeArc: "Opens with an image of carrying dreams in a pocket, builds through struggle and the gap between public hustle and private pain, pivots from money to freedom, and closes by circling back to the same kid with a bigger reason — a loop rather than a ladder.",
+		atmosphere: "Late-night city confidence: guarded, tired, but hopeful.",
+		perspective: "First-person narrator who presents themselves as unchanged by success — reflective rather than braggadocious.",
+		languageNotes: "English with mainstream hip-hop idiom ('keep it real', 'the hustle', 'the mission'). No code-switching present, so no translation questions arise.",
+		slangAndReferences: [
+			{
+				id: "demo-slang-1",
+				title: "Keep it real",
+				explanation: "Standard hip-hop phrase for staying authentic under pressure. Here it anchors the narrator's personal code rather than a crew or scene.",
+				evidenceType: "unverified"
+			},
+			{
+				id: "demo-slang-2",
+				title: "The hustle",
+				explanation: "Ambitious work, often borderline or exhausting effort. The line flips it: the hustle is visible, the cost behind it is not.",
+				evidenceType: "unverified"
+			},
+			{
+				id: "demo-slang-3",
+				title: "New dreams, different season",
+				explanation: "'Season' treats time like weather — circumstances change around a fixed place ('same city') and a fixed person ('still the same kid').",
+				evidenceType: "interpretive"
+			}
+		]
+	},
+	structure: [
+		{
+			type: "intro",
+			label: "Opening image",
+			startIndex: 0,
+			endIndex: 1,
+			note: "No markers in the text — inferred from the scene-setting first two lines (model reading).",
+			source: "model"
+		},
+		{
+			type: "verse",
+			label: "Verse 1",
+			startIndex: 2,
+			endIndex: 7,
+			note: "Narrative build: code, identity, hidden struggle, values pivot (inferred — no markers present).",
+			source: "model"
+		},
+		{
+			type: "outro",
+			label: "Closing",
+			startIndex: 8,
+			endIndex: 11,
+			note: "Slogan lines and couplet resolution close the piece (inferred — no markers present).",
+			source: "model"
+		}
+	],
+	flowMap: [
+		{
+			section: "Opening image",
+			flowStyle: "Conversational open — full-line statements with space between them (inferred from line shape; not heard).",
+			rhythm: "Even, walking-pace phrasing; no punctuation breaks to interrupt the first two lines.",
+			rhymeTechnique: "Ends set up later payoffs loosely ('pocket', 'sky'); no exact partner lands here.",
+			effect: "Grounds the listener in place before any theme is stated."
+		},
+		{
+			section: "Verse 1",
+			flowStyle: "Density rises through the middle; the longest lines (money/freedom) suggest a double-time lean — a guess from line length only.",
+			rhythm: "Punctuation arrives mid-section (lines 5–6), implying phrase breaks the delivery would have to breathe around.",
+			rhymeTechnique: "The first exact couplet lands here (pain / rain), then identity talk stays mostly unrhymed until the close.",
+			effect: "Momentum builds toward the values pivot at 'chasing freedom'."
+		},
+		{
+			section: "Closing",
+			flowStyle: "Shorter slogan lines, then a clipped three-beat fragment to end — usually read as a hard stop.",
+			rhythm: "Line 8 reads like a stamped statement; line 11's fragments ('No map / just a vision / I'm on it') invite staccato placement (inferred).",
+			rhymeTechnique: "Season / reason couplet carries the section; 'mission' has no exact partner.",
+			effect: "Converts momentum into a quotable exit line."
+		}
+	],
+	scorecard: [
+		{
+			dimension: "storytelling",
+			score: 6,
+			evidence: "There is a clear arc — image, struggle, pivot, resolve — but it moves through abstractions rather than scenes; no names, places, or incidents appear anywhere in the twelve lines."
+		},
+		{
+			dimension: "wordplay",
+			score: 6,
+			evidence: "'Dreams in my pocket' makes an abstraction portable, and 'not just chasing money, I'm chasing freedom' is a clean reframe punchline — but there are few true double entendres."
+		},
+		{
+			dimension: "rhyme_complexity",
+			score: 5,
+			evidence: "Two exact spelling couples (pain/rain, season/reason) and one slant pair (journey/money) across twelve lines; little internal or multisyllabic work is attempted."
+		},
+		{
+			dimension: "flow_cadence",
+			score: 6,
+			evidence: "Line lengths swing from the long money/freedom line to the clipped closer, which usually implies cadence changes — scored from text shape only, since no audio exists."
+		},
+		{
+			dimension: "technical_delivery",
+			score: 6,
+			evidence: "Deliberate phrasing shows in the bookended 'same…same' construction and the three-fragment closer; no dense multisyllabic display is attempted."
+		},
+		{
+			dimension: "emotional_impact",
+			score: 6,
+			evidence: "The smile/rain contrast and the money/freedom pivot land; the lack of concrete detail keeps the verse from hitting harder."
+		},
+		{
+			dimension: "beat_synergy",
+			score: 5,
+			evidence: "No beat or audio was supplied — this scores only how well internal phrase lengths fit together, not a heard performance."
+		},
+		{
+			dimension: "overall_songwriting",
+			score: 6,
+			evidence: "Coherent, quotable, honestly crafted — memorable closing lines, but generic imagery keeps it safe."
+		}
+	],
+	strongestMoments: [
+		{
+			barIndex: 7,
+			moment: "I'm not just chasing money, I'm chasing freedom",
+			why: "The repetition of 'chasing' swaps the object instead of stopping the verb — a one-line redefinition of success."
+		},
+		{
+			barIndex: 6,
+			moment: "Behind the smile, there's a story in the rain",
+			why: "Pairs an exact rhyme with the previous line while carrying the hidden-struggle theme in a single image."
+		},
+		{
+			barIndex: 11,
+			moment: "No map, just a vision, I'm on it",
+			why: "Fragmented closer mirrors line 1's pocket-sized dream and converts the whole verse into momentum."
+		}
+	],
+	weaknesses: [{
+		observation: "Universal nouns do the work that specific details should.",
+		evidence: "Lines 0–11 stay on city / streets / stage / season without a single name, place, or incident — the imagery is generic motivational."
+	}, {
+		observation: "The first half leans thin on rhyme.",
+		evidence: "The text pass finds no exact end-spelling group across lines 0–4; the first exact couplet only arrives at lines 5–6."
+	}],
+	themes: [
+		{
+			id: "demo-theme-1",
+			title: "Identity through change",
+			explanation: "'Same soul… still the same me' and 'still the same kid' bookend the verse — growth is allowed, replacement is not.",
+			evidenceType: "interpretive"
+		},
+		{
+			id: "demo-theme-2",
+			title: "Ambition as a daily practice",
+			explanation: "Dreams are carried, steps are lessons, tomorrow is a mission — ambition is framed as routine, not event.",
+			evidenceType: "interpretive"
+		},
+		{
+			id: "demo-theme-3",
+			title: "Visible hustle vs invisible cost",
+			explanation: "What 'they see' and what 'they don't know' split the narrator in two; the smile/rain couplet holds both halves.",
+			evidenceType: "interpretive"
+		}
+	],
+	metaphors: [
+		{
+			id: "demo-meta-1",
+			title: "Dreams as something you carry",
+			explanation: "'Dreams in my pocket' treats an abstraction as a small physical possession — ambition is portable and private.",
+			evidenceType: "interpretive"
+		},
+		{
+			id: "demo-meta-2",
+			title: "Rain as hardship",
+			explanation: "'A story in the rain' puts the hidden backstory inside weather — trouble that falls on everyone but reads differently per person.",
+			evidenceType: "interpretive"
+		},
+		{
+			id: "demo-meta-3",
+			title: "Season as passing circumstance",
+			explanation: "'Different season' frames change as weather around a fixed place — the city and the kid stay, conditions turn.",
+			evidenceType: "interpretive"
+		}
+	],
+	doubleMeanings: [{
+		id: "demo-double-1",
+		title: "Chasing money / chasing freedom",
+		explanation: "The same verb keeps its energy while the object changes — 'chasing' can be emptiness or purpose depending on the noun that follows it.",
+		evidenceType: "interpretive"
+	}, {
+		id: "demo-double-2",
+		title: "Still the same me / just a bigger reason",
+		explanation: "'Same' claims continuity while 'bigger' admits change — the narrator is unchanged in character but not in justification.",
+		evidenceType: "interpretive"
+	}],
+	punchlines: [{
+		id: "demo-punch-1",
+		title: "Not just money — freedom",
+		explanation: "'Not just X, I'm Y' is a classic reframe shape; the punch lands because 'chasing' is admitted, only the target is upgraded.",
+		evidenceType: "interpretive"
+	}, {
+		id: "demo-punch-2",
+		title: "No map, just a vision",
+		explanation: "The closer rejects planning vocabulary ('map') in favor of instinct ('vision') in seven words — compact and quotable.",
+		evidenceType: "interpretive"
+	}],
+	culturalReferences: [{
+		id: "demo-cult-1",
+		title: "Hustle-culture vocabulary",
+		explanation: "'Hustle', 'the mission', 'keep it real' come from mainstream hip-hop idiom used generically — no specific scene, city, or crew is claimed (unverified).",
+		evidenceType: "unverified"
+	}],
+	alternativeInterpretations: [{
+		id: "demo-alt-1",
+		title: "Generic motivational register",
+		explanation: "Read unsympathetically, the verse could be stock self-help in rap clothing — its lack of specifics cuts both ways: universal or vague.",
+		evidenceType: "interpretive"
+	}],
+	limitations: "Only the twelve pasted lines were read. No beat, audio, artist context, or outside references were available; delivery questions stay unanswered.",
+	bars: [
+		{
+			index: 0,
+			meaning: "Sets the scene: the narrator moves through the city while carrying ambitions ('dreams') as something portable and personal.",
+			alternative: "Could be read literally — pockets holding plans or money — but the dream reading fits the lines that follow.",
+			wordplay: ["'Dreams in my pocket' turns an abstraction into a physical possession."],
+			metaphors: ["Dreams as something you carry."],
+			rhymeMechanics: "Ends on 'pocket'. The text pass finds no exact partner — any sound match would need audio to judge.",
+			narrativeFunction: "Opening image; establishes place and want in one line.",
+			confidence: "high",
+			uncertainty: "'Pocket' has no exact spelling partner in these lines.",
+			tags: [{
+				label: "Metaphor",
+				kind: "metaphor"
+			}, {
+				label: "Theme",
+				kind: "theme"
+			}]
+		},
+		{
+			index: 1,
+			meaning: "Contrasts hard physical reality with mental altitude — dreaming while staying present in the environment.",
+			alternative: null,
+			wordplay: ["Ground ('concrete streets') against sky ('mind's in the sky') — a spatial opposition."],
+			metaphors: ["Sky as limit-free mental space."],
+			rhymeMechanics: "No end-rhyme partner ('sky' is too short to key on). The line leans on the internal ground/sky opposition instead — that opposition is an interpretation, not a verified internal rhyme.",
+			narrativeFunction: "Raises the stakes from scene to mindset.",
+			confidence: "high",
+			uncertainty: "Calling the ground/sky contrast an internal rhyme is a stylistic judgment.",
+			tags: [{
+				label: "Wordplay",
+				kind: "wordplay"
+			}, {
+				label: "Internal Rhyme",
+				kind: "internal_rhyme"
+			}]
+		},
+		{
+			index: 2,
+			meaning: "Frames experience as curriculum; 'keep it real' asserts authenticity as the rule of the road.",
+			alternative: null,
+			wordplay: ["'Step…lesson' links walking to learning — extended by 'journey' two lines later."],
+			metaphors: [],
+			rhymeMechanics: "Ends 'real' with no exact partner here. The strength is the step/lesson linkage inside the line.",
+			narrativeFunction: "States the personal code the rest of the verse will test.",
+			confidence: "high",
+			uncertainty: "The step/lesson link is thematic rather than phonetic — no rhyme is claimed.",
+			tags: [{
+				label: "Theme",
+				kind: "theme"
+			}]
+		},
+		{
+			index: 3,
+			meaning: "Compresses an entire career arc into one line: hardship becomes performance.",
+			alternative: null,
+			wordplay: ["'Struggle to the stage' — hardship and showcase share one path."],
+			metaphors: ["Stage as arrival point of the street-level journey."],
+			rhymeMechanics: "Ends 'journey'; only a slant pairing with 'money' later in the verse holds (approximate, not spelling-verified).",
+			narrativeFunction: "Compresses time and introduces the journey motif.",
+			confidence: "medium",
+			uncertainty: "The journey/money sound match is approximate and would need audio to confirm.",
+			tags: [{
+				label: "Slant Rhyme",
+				kind: "slant"
+			}, {
+				label: "Theme",
+				kind: "theme"
+			}]
+		},
+		{
+			index: 4,
+			meaning: "Identity persists through change — the chapter turns, the self doesn't.",
+			alternative: null,
+			wordplay: ["'Same…same' bookends with 'different' pivoting between them."],
+			metaphors: [],
+			rhymeMechanics: "Ends on the short 'me' — no spelling group. The construction is rhetorical repetition, not rhyme.",
+			narrativeFunction: "Theme statement: continuity of self.",
+			confidence: "high",
+			uncertainty: "'me' is too short to rhyme on — the repetition here is rhetorical.",
+			tags: [{
+				label: "Repetition",
+				kind: "repetition"
+			}]
+		},
+		{
+			index: 5,
+			meaning: "Public effort is visible; private cost isn't — the narrator is split into show and truth.",
+			alternative: null,
+			wordplay: ["'See' against 'know' sets up the visible/invisible split that line 6 completes."],
+			metaphors: [],
+			rhymeMechanics: "Ends 'pain', matching 'rain' in the next line — an exact three-letter spelling match the text pass also finds.",
+			narrativeFunction: "Turns outward — how the narrator is perceived.",
+			confidence: "high",
+			uncertainty: "Spelling-exact couplet; pronunciation remains unverified.",
+			tags: [{
+				label: "End Rhyme",
+				kind: "end_rhyme"
+			}, {
+				label: "Theme",
+				kind: "theme"
+			}]
+		},
+		{
+			index: 6,
+			meaning: "Suggests a hidden backstory under a composed exterior; 'rain' carries the hardship.",
+			alternative: null,
+			wordplay: [],
+			metaphors: ["Rain as adversity falling behind the smile."],
+			rhymeMechanics: "Ends 'rain', rhyming with 'pain' (line 5) — the couplet anchors the verse's emotional low point.",
+			narrativeFunction: "Deepens the hidden-struggle thread started one line earlier.",
+			confidence: "high",
+			uncertainty: "Exact spelling match — hearing how it lands would require audio.",
+			tags: [{
+				label: "End Rhyme",
+				kind: "end_rhyme"
+			}, {
+				label: "Metaphor",
+				kind: "metaphor"
+			}]
+		},
+		{
+			index: 7,
+			meaning: "Redefines success: the chase continues, but the target changed from money to freedom.",
+			alternative: null,
+			wordplay: ["Repeated 'chasing' with swapped objects — money out, freedom in.", "'Not just X, I'm Y' is a classic reframe punchline shape."],
+			metaphors: ["Freedom as the currency worth chasing."],
+			rhymeMechanics: "Ends 'freedom' with no exact partner ('mission' is only a slant at best). The line's force is structural, not phonetic.",
+			narrativeFunction: "The values pivot — the verse's argument in one line.",
+			confidence: "high",
+			uncertainty: "Any slant match to 'mission' is weak; the line works structurally.",
+			tags: [{
+				label: "Wordplay",
+				kind: "wordplay"
+			}, {
+				label: "Theme",
+				kind: "theme"
+			}]
+		},
+		{
+			index: 8,
+			meaning: "Names the goal in mission language — future-oriented resolve stated like an order.",
+			alternative: null,
+			wordplay: ["'Mission' doubles as personal mission statement."],
+			metaphors: [],
+			rhymeMechanics: "Ends 'mission' — no exact partner ('season' shares only 'on' ending, too short to key).",
+			narrativeFunction: "Compresses the goal into a slogan line.",
+			confidence: "medium",
+			uncertainty: "The line reads as slogan rather than rhyme setup; intent is unverifiable from text.",
+			tags: [{
+				label: "Theme",
+				kind: "theme"
+			}]
+		},
+		{
+			index: 9,
+			meaning: "Same place, changed circumstances — growth framed as weather around a fixed home.",
+			alternative: null,
+			wordplay: ["'Same…new…different' — controlled contrast in three words."],
+			metaphors: ["Season as passing time."],
+			rhymeMechanics: "Ends 'season', rhyming with 'reason' (line 10) — exact three-letter match with a five-letter overlap, which the text pass flags as approximate multisyllabic.",
+			narrativeFunction: "Opens the closing couplet pair.",
+			confidence: "high",
+			uncertainty: "Five-letter overlap is approximate — not a verified multisyllabic rhyme.",
+			tags: [{
+				label: "End Rhyme",
+				kind: "end_rhyme"
+			}, {
+				label: "Multisyllabic",
+				kind: "multisyllabic"
+			}]
+		},
+		{
+			index: 10,
+			meaning: "Identity again: same person, stronger justification — growth explains, not erases.",
+			alternative: null,
+			wordplay: ["'Season'/'reason' payoff; 'bigger reason' answers the why the verse circled."],
+			metaphors: [],
+			rhymeMechanics: "Ends 'reason', matching 'season' (line 9) — the verse's cleanest rhyme pair, anchored in the theme itself.",
+			narrativeFunction: "Resolves the identity theme with the closing rhyme.",
+			confidence: "high",
+			uncertainty: "Spelling-exact; phonetic delivery unverified.",
+			tags: [{
+				label: "End Rhyme",
+				kind: "end_rhyme"
+			}, {
+				label: "Repetition",
+				kind: "repetition"
+			}]
+		},
+		{
+			index: 11,
+			meaning: "No prescribed route, only intention — self-directed momentum as the closing stance.",
+			alternative: null,
+			wordplay: ["Fragmented closer: three short beats instead of one flowing sentence."],
+			metaphors: ["Map as a prescribed plan; vision as instinct."],
+			rhymeMechanics: "Ends on 'it' — too short for any spelling group. Whatever snap this line has would be a delivery question, unanswerable from text.",
+			narrativeFunction: "Closer — returns to line 1's pocket-sized dream and acts on it.",
+			confidence: "high",
+			uncertainty: "Final-word rhyming is impossible here; cadence claims would need audio.",
+			tags: [{
+				label: "Cadence",
+				kind: "cadence"
+			}, {
+				label: "Wordplay",
+				kind: "wordplay"
+			}]
+		}
+	],
+	rhymes: [
+		{
+			id: "demo-rhyme-1",
+			type: "end",
+			letter: "A",
+			sound: "/eɪn/ (guess)",
+			explanation: "Exact spelling couplet on the last word of lines 5 and 6 — the text pass finds the same three-letter match ('ain').",
+			members: [{
+				barIndex: 5,
+				word: "pain",
+				note: "ends line 5"
+			}, {
+				barIndex: 6,
+				word: "rain",
+				note: "answers line 5"
+			}]
+		},
+		{
+			id: "demo-rhyme-2",
+			type: "multisyllabic",
+			letter: "B",
+			sound: "/iːzən/ (guess)",
+			explanation: "Lines 9 and 10 share 'season'/'reason' — five-letter overlap, the approximate multisyllabic pair of the verse.",
+			members: [{
+				barIndex: 9,
+				word: "season",
+				note: "sets up the rhyme"
+			}, {
+				barIndex: 10,
+				word: "reason",
+				note: "lands the rhyme"
+			}]
+		},
+		{
+			id: "demo-rhyme-3",
+			type: "slant",
+			letter: "C",
+			sound: "/ɜːrni/ vs /mʌni/ (guesses)",
+			explanation: "'Journey' and 'money' share a stressed ending sound but not spelling — a slant pairing only, approximate.",
+			members: [{
+				barIndex: 3,
+				word: "journey",
+				note: "the arc"
+			}, {
+				barIndex: 7,
+				word: "money",
+				note: "what is chased"
+			}]
+		}
+	],
+	flowNotes: [
+		"Line lengths swing from the long money/freedom line to clipped closers — variance that usually signals cadence changes between lines.",
+		"Punctuation mid-verse (lines 5–6) suggests phrase breaks a delivery would breathe around — not measured breaths.",
+		"The final line's three fragments invite staccato placement after flowing sentences — an inference from text shape only."
+	],
+	cadenceNotes: ["No line carries more than about 15 estimated syllables — this reads as moderate density, not double-time.", "The closing fragment ('No map, just a vision, I'm on it') would function as a hard stop after longer lines."],
+	sourceLines: DEMO_LYRICS.split("\n")
+};
+var DEMO_PROJECT_ID = "demo-street-dreams";
+function createDemoProject() {
+	const now = "2026-01-01T00:00:00.000Z";
+	return {
+		id: DEMO_PROJECT_ID,
+		title: "Street Dreams (Demo)",
+		artist: "Lab demo",
+		language: "English",
+		lyrics: DEMO_LYRICS,
+		modules: [
+			"meaning",
+			"wordplay",
+			"rhyme",
+			"narrative",
+			"flow",
+			"story",
+			"scorecard"
+		],
+		createdAt: now,
+		updatedAt: now,
+		model: DEMO_MODEL_READING,
+		modelError: null,
+		practiceNotes: [],
+		isDemo: true
+	};
+}
+function validateLyrics(lyrics) {
+	const trimmed = lyrics.trim();
+	if (!trimmed) return "Paste at least one line before analyzing.";
+	if (trimmed.length > 8e3) return `Keep the excerpt under ${MAX_LYRICS.toLocaleString()} characters.`;
+	if (splitBars(trimmed).length > 40) return `Analyze up to 40 non-empty lines at a time.`;
+	return null;
+}
+function validateTitle(title) {
+	const trimmed = title.trim();
+	if (!trimmed) return "Add a title.";
+	if (trimmed.length > 120) return "Keep the title under 120 characters.";
+	return null;
+}
+function validateArtist(artist) {
+	if (artist.trim().length > 120) return "Keep the artist name under 120 characters.";
+	return null;
+}
+function validateUrl(value) {
+	const trimmed = value.trim();
+	if (!trimmed) return null;
+	try {
+		const url = new URL(trimmed);
+		if (url.protocol !== "http:" && url.protocol !== "https:") return "Use an http or https link.";
+		return null;
+	} catch {
+		return "That link is not a valid URL.";
+	}
+}
+var MAX_AUDIO_BYTES = 31457280;
+var generations = /* @__PURE__ */ new Map();
+function touch(project, patch) {
+	return {
+		...project,
+		...patch,
+		updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+	};
+}
+var useLabStore = create()(persist((set, get) => ({
+	projects: [createDemoProject()],
+	activeProjectId: createDemoProject().id,
+	displayName: "Dipesh",
+	defaultLanguage: "English",
+	sidebarCollapsed: false,
+	selectedBar: 0,
+	lastSavedAt: null,
+	analyzingProjectId: null,
+	audio: null,
+	setDisplayName: (name) => set({ displayName: name.slice(0, 40) }),
+	setDefaultLanguage: (language) => set({ defaultLanguage: language }),
+	setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
+	setSelectedBar: (selectedBar) => set({ selectedBar }),
+	setActiveProject: (activeProjectId) => set({
+		activeProjectId,
+		selectedBar: 0
+	}),
+	createProject: (input) => {
+		const id = crypto.randomUUID();
+		const now = (/* @__PURE__ */ new Date()).toISOString();
+		const project = {
+			id,
+			title: input.title.trim(),
+			artist: input.artist.trim() || "Unknown artist",
+			language: input.language,
+			lyrics: input.lyrics ?? "",
+			modules: input.modules ?? [
+				"meaning",
+				"wordplay",
+				"rhyme",
+				"narrative",
+				"flow",
+				"story",
+				"scorecard"
+			],
+			createdAt: now,
+			updatedAt: now,
+			sourceUrl: input.sourceUrl,
+			model: null,
+			modelError: null,
+			practiceNotes: []
+		};
+		set((state) => ({
+			projects: [project, ...state.projects],
+			activeProjectId: id,
+			selectedBar: 0
+		}));
+		return id;
+	},
+	patchProject: (id, patch) => set((state) => ({ projects: state.projects.map((project) => project.id === id ? touch(project, patch) : project) })),
+	setLyrics: (id, lyrics) => set((state) => ({ projects: state.projects.map((project) => project.id === id ? touch(project, {
+		lyrics,
+		modelError: null
+	}) : project) })),
+	toggleModule: (id, moduleId) => set((state) => ({ projects: state.projects.map((project) => {
+		if (project.id !== id) return project;
+		return touch(project, { modules: project.modules.includes(moduleId) ? project.modules.filter((item) => item !== moduleId) : [...project.modules, moduleId] });
+	}) })),
+	deleteProject: (id) => set((state) => {
+		const projects = state.projects.filter((project) => project.id !== id);
+		const activeProjectId = state.activeProjectId === id ? projects[0]?.id ?? null : state.activeProjectId;
+		const audio = state.audio?.projectId === id ? null : state.audio;
+		if (state.audio?.projectId === id) URL.revokeObjectURL(state.audio.url);
+		return {
+			projects,
+			activeProjectId,
+			audio,
+			selectedBar: 0
+		};
+	}),
+	duplicateProject: (id) => {
+		const source = get().projects.find((project) => project.id === id);
+		if (!source) return null;
+		const copyId = crypto.randomUUID();
+		const now = (/* @__PURE__ */ new Date()).toISOString();
+		const copy = {
+			...source,
+			id: copyId,
+			title: `${source.title} copy`.slice(0, 120),
+			createdAt: now,
+			updatedAt: now,
+			isDemo: false,
+			practiceNotes: source.practiceNotes.map((note) => ({ ...note })),
+			model: source.model ? {
+				...source.model,
+				bars: [...source.model.bars]
+			} : null
+		};
+		set((state) => ({
+			projects: [copy, ...state.projects],
+			activeProjectId: copyId,
+			selectedBar: 0
+		}));
+		return copyId;
+	},
+	savePracticeNote: (projectId, note) => set((state) => ({ projects: state.projects.map((project) => {
+		if (project.id !== projectId) return project;
+		return touch(project, { practiceNotes: [...project.practiceNotes.filter((item) => !(item.barIndex === note.barIndex && item.prompt === note.prompt)), note] });
+	}) })),
+	restoreDemo: () => {
+		const demo = createDemoProject();
+		set((state) => {
+			if (state.projects.some((project) => project.id === demo.id)) return {
+				activeProjectId: demo.id,
+				selectedBar: 0
+			};
+			return {
+				projects: [demo, ...state.projects],
+				activeProjectId: demo.id,
+				selectedBar: 0
+			};
+		});
+	},
+	clearAll: () => {
+		const audio = get().audio;
+		if (audio) URL.revokeObjectURL(audio.url);
+		const demo = createDemoProject();
+		set({
+			projects: [demo],
+			activeProjectId: demo.id,
+			selectedBar: 0,
+			audio: null,
+			analyzingProjectId: null
+		});
+	},
+	markSaved: () => set({ lastSavedAt: (/* @__PURE__ */ new Date()).toISOString() }),
+	analyzeProject: async (projectId) => {
+		if (get().analyzingProjectId) return;
+		const project = get().projects.find((item) => item.id === projectId);
+		if (!project) return;
+		const lyricsError = validateLyrics(project.lyrics);
+		if (lyricsError) {
+			get().patchProject(projectId, { modelError: lyricsError });
+			return;
+		}
+		if (project.modules.length === 0) {
+			get().patchProject(projectId, { modelError: "Select at least one analysis module." });
+			return;
+		}
+		const generation = (generations.get(projectId) ?? 0) + 1;
+		generations.set(projectId, generation);
+		set({ analyzingProjectId: projectId });
+		get().patchProject(projectId, { modelError: null });
+		try {
+			const result = await analyzeLyrics({ data: {
+				lyrics: project.lyrics,
+				language: project.language,
+				title: project.title,
+				artist: project.artist,
+				modules: project.modules
+			} });
+			if (generations.get(projectId) !== generation) return;
+			if (!result.ok) {
+				get().patchProject(projectId, { modelError: result.error });
+				return;
+			}
+			get().patchProject(projectId, {
+				model: result.analysis,
+				modelError: null
+			});
+		} catch (error) {
+			if (generations.get(projectId) !== generation) return;
+			get().patchProject(projectId, { modelError: error instanceof Error ? error.message : "The reading failed. Your lyrics were kept." });
+		} finally {
+			if (generations.get(projectId) === generation) set({ analyzingProjectId: null });
+		}
+	},
+	attachAudio: async (projectId, file) => {
+		if (file.size > MAX_AUDIO_BYTES) return {
+			ok: false,
+			error: "Keep audio files under 30 MB."
+		};
+		try {
+			const arrayBuffer = await file.arrayBuffer();
+			const context = new AudioContext();
+			const decoded = await context.decodeAudioData(arrayBuffer.slice(0));
+			const channel = decoded.getChannelData(0);
+			const buckets = 180;
+			const block = Math.max(1, Math.floor(channel.length / buckets));
+			const peaks = [];
+			for (let index = 0; index < buckets; index += 1) {
+				let max = 0;
+				const start = index * block;
+				const end = Math.min(channel.length, start + block);
+				for (let sample = start; sample < end; sample += 16) max = Math.max(max, Math.abs(channel[sample] ?? 0));
+				peaks.push(max);
+			}
+			const peakMax = Math.max(...peaks, .001);
+			await context.close();
+			const previous = get().audio;
+			if (previous) URL.revokeObjectURL(previous.url);
+			set({ audio: {
+				projectId,
+				fileName: file.name,
+				url: URL.createObjectURL(file),
+				duration: decoded.duration,
+				sampleRate: decoded.sampleRate,
+				peaks: peaks.map((peak) => peak / peakMax)
+			} });
+			return { ok: true };
+		} catch {
+			return {
+				ok: false,
+				error: "That file could not be decoded as audio."
+			};
+		}
+	},
+	clearAudio: () => {
+		const audio = get().audio;
+		if (audio) URL.revokeObjectURL(audio.url);
+		set({ audio: null });
+	}
+}), {
+	name: "diprap-lab",
+	storage: createJSONStorage(() => localStorage),
+	partialize: (state) => ({
+		projects: state.projects,
+		activeProjectId: state.activeProjectId,
+		displayName: state.displayName,
+		defaultLanguage: state.defaultLanguage,
+		sidebarCollapsed: state.sidebarCollapsed,
+		lastSavedAt: state.lastSavedAt
+	})
+}));
+function useActiveProject() {
+	return useLabStore((state) => state.projects.find((project) => project.id === state.activeProjectId) ?? null);
+}
+function Mark() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", {
+		viewBox: "0 0 32 32",
+		className: "size-9 shrink-0 text-accent",
+		"aria-hidden": true,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("rect", {
+			width: "32",
+			height: "32",
+			rx: "8",
+			fill: "currentColor"
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", {
+			d: "M7 17.5v-3M11 20.5v-9M15 22.5v-13M19 20v-8M23 17.5v-3",
+			className: "stroke-bg",
+			strokeWidth: "2",
+			strokeLinecap: "round"
+		})]
+	});
+}
+function Sidebar({ collapsed, onNavigate, mobile = false }) {
+	const pathname = useRouterState({ select: (state) => state.location.pathname });
+	const view = useRouterState({ select: (state) => state.location.search.view });
+	const project = useLabStore((state) => state.projects.find((item) => item.id === state.activeProjectId));
+	const setCollapsed = useLabStore((state) => state.setSidebarCollapsed);
+	const narrow = collapsed && !mobile;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("aside", {
+		className: cn("flex h-full shrink-0 flex-col border-r border-border bg-surface", mobile ? "w-72" : narrow ? "w-16" : "w-64"),
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: cn("flex items-center gap-3 px-3 py-4", narrow && "justify-center px-2"),
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mark, {}), narrow ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "min-w-0",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-sm font-semibold tracking-wide text-fg",
+						children: "DIPRAP"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "truncate text-xs text-faint",
+						children: "Rap Lyrics & Song Analysis Lab"
+					})]
+				})]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
+				"aria-label": "Primary",
+				className: "flex flex-1 flex-col gap-1 overflow-y-auto px-2",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/",
+						label: "Dashboard",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(House, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/search",
+						label: "Song Search",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/search",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnalyzeItem, {
+						label: "Bar-by-Bar Analysis",
+						view: "bars",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Rows3, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/analyze" && view === "bars",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AnalyzeItem, {
+						label: "Context & Insights",
+						view: "story",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BookOpen, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/analyze" && view === "story",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/rhyme-lab",
+						label: "Rhyme Lab",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AudioLines, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/rhyme-lab",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/flow-lab",
+						label: "Flow & Cadence",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Activity, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/flow-lab",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/practice",
+						label: "Practice Lab",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(GraduationCap, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/practice",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/projects",
+						label: "My Projects",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FolderOpen, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/projects",
+						onNavigate
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(NavItem, {
+						to: "/settings",
+						label: "Settings",
+						icon: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Settings, {
+							className: "size-4",
+							"aria-hidden": true
+						}),
+						narrow,
+						current: pathname === "/settings",
+						onNavigate
+					})
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "space-y-2 border-t border-border p-2",
+				children: [project && !narrow ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+					to: "/analyze",
+					search: { view: "overview" },
+					onClick: onNavigate,
+					className: "block rounded-md border border-border bg-bg px-3 py-2 hover:border-accent",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "text-xs text-faint",
+							children: "Current project"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "truncate text-sm font-medium text-fg",
+							children: project.title
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "truncate text-xs text-muted",
+							children: project.artist
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "mt-2 text-xs text-muted",
+							children: project.model ? "Model reading saved" : "Text estimate only"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mt-3",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center justify-between gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									className: "text-xs text-faint",
+									children: "Analysis Progress"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+									className: "font-mono text-xs text-muted",
+									children: [project.modules.length, " / 7 modules"]
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "mt-1 h-1.5 overflow-hidden rounded-full bg-raised",
+								role: "progressbar",
+								"aria-valuemin": 0,
+								"aria-valuemax": 7,
+								"aria-valuenow": project.modules.length,
+								"aria-label": "Analysis modules completed",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "h-full rounded-full bg-accent transition-all",
+									style: { width: `${project.modules.length / 7 * 100}%` }
+								})
+							})]
+						})
+					]
+				}) : null, mobile ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+					type: "button",
+					className: "flex min-h-11 w-full items-center justify-center gap-2 rounded-md text-sm text-muted hover:bg-raised hover:text-fg",
+					onClick: () => setCollapsed(!collapsed),
+					"aria-pressed": collapsed,
+					children: [collapsed ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PanelLeft, {
+						className: "size-4",
+						"aria-hidden": true
+					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, {
+						className: "size-4",
+						"aria-hidden": true
+					}), narrow ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "sr-only",
+						children: "Expand sidebar"
+					}) : "Collapse"]
+				})]
+			})
+		]
+	});
+}
+function NavItem({ to, label, icon, narrow, current, onNavigate }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+		to,
+		onClick: onNavigate,
+		"aria-current": current ? "page" : void 0,
+		title: narrow ? label : void 0,
+		className: cn("flex min-h-11 items-center gap-3 rounded-md px-3 text-sm", narrow && "justify-center px-0", current ? "bg-accent text-accent-fg" : "text-muted hover:bg-raised hover:text-fg"),
+		children: [icon, narrow ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+			className: "sr-only",
+			children: label
+		}) : label]
+	});
+}
+function AnalyzeItem({ label, view, icon, narrow, current, onNavigate }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+		to: "/analyze",
+		search: { view },
+		onClick: onNavigate,
+		"aria-current": current ? "page" : void 0,
+		title: narrow ? label : void 0,
+		className: cn("flex min-h-11 items-center gap-3 rounded-md px-3 text-sm", narrow && "justify-center px-0", current ? "bg-accent text-accent-fg" : "text-muted hover:bg-raised hover:text-fg"),
+		children: [icon, narrow ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+			className: "sr-only",
+			children: label
+		}) : label]
+	});
+}
+function BrandInitials({ name }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+		className: "grid size-9 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-fg",
+		children: initials(name)
+	});
+}
+function Topbar({ onMenu }) {
+	const projects = useLabStore((state) => state.projects);
+	const displayName = useLabStore((state) => state.displayName);
+	const setActiveProject = useLabStore((state) => state.setActiveProject);
+	const navigate = useNavigate();
+	const inputRef = (0, import_react.useRef)(null);
+	const listId = (0, import_react.useId)();
+	const [query, setQuery] = (0, import_react.useState)("");
+	const [debounced, setDebounced] = (0, import_react.useState)("");
+	const [open, setOpen] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		const timer = window.setTimeout(() => setDebounced(query), 200);
+		return () => window.clearTimeout(timer);
+	}, [query]);
+	(0, import_react.useEffect)(() => {
+		function onKey(event) {
+			if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+				event.preventDefault();
+				inputRef.current?.focus();
+			}
+		}
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, []);
+	const results = (0, import_react.useMemo)(() => {
+		const needle = debounced.trim().toLowerCase();
+		if (!needle) return [];
+		return projects.filter((project) => `${project.title} ${project.artist} ${project.lyrics}`.toLowerCase().includes(needle)).slice(0, 8);
+	}, [debounced, projects]);
+	const request = debounced.trim();
+	const showList = open && request.length > 0;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
+		className: "flex min-h-16 items-center gap-2 border-b border-border bg-bg/90 px-3 md:gap-4 md:px-5",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+				type: "button",
+				className: "grid size-11 place-items-center rounded-md text-fg hover:bg-raised md:hidden",
+				onClick: onMenu,
+				"aria-label": "Open navigation",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
+					className: "size-5",
+					"aria-hidden": true
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative min-w-0 flex-1",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+						className: "sr-only",
+						htmlFor: "project-search",
+						children: "Search projects"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, {
+						className: "pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-faint",
+						"aria-hidden": true
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+						id: "project-search",
+						ref: inputRef,
+						value: query,
+						role: "combobox",
+						"aria-expanded": showList,
+						"aria-controls": listId,
+						"aria-autocomplete": "list",
+						placeholder: "Search projects, artists, or lyrics…",
+						suppressHydrationWarning: true,
+						onChange: (event) => {
+							setQuery(event.target.value);
+							setOpen(true);
+						},
+						onFocus: () => setOpen(true),
+						onBlur: () => window.setTimeout(() => setOpen(false), 150),
+						className: "h-11 w-full rounded-md border border-border bg-surface pr-16 pl-10 text-sm text-fg placeholder:text-faint"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("kbd", {
+						className: "pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded border border-border px-1.5 py-0.5 font-mono text-xs text-faint sm:inline",
+						children: "Ctrl K"
+					}),
+					showList ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+						id: listId,
+						role: "listbox",
+						className: "absolute z-30 mt-2 max-h-80 w-full overflow-auto rounded-md border border-border bg-raised p-1 shadow-lg",
+						children: results.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+							className: "px-3 py-3 text-sm text-muted",
+							children: "No saved projects match."
+						}) : results.map((project) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+							role: "option",
+							"aria-selected": false,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+								type: "button",
+								className: "flex min-h-11 w-full flex-col items-start justify-center rounded px-3 text-left hover:bg-surface",
+								onMouseDown: (event) => event.preventDefault(),
+								onClick: () => {
+									setActiveProject(project.id);
+									setQuery("");
+									setOpen(false);
+									navigate({
+										to: "/analyze",
+										search: { view: "overview" }
+									});
+								},
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-sm text-fg",
+									children: project.title
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-xs text-muted",
+									children: project.artist
+								})]
+							})
+						}, project.id))
+					}) : null
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Dialog, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTrigger, {
+				asChild: true,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+					type: "button",
+					className: "grid size-11 place-items-center rounded-md text-muted hover:bg-raised hover:text-fg",
+					"aria-label": "How readings are labeled",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleHelp, {
+						className: "size-5",
+						"aria-hidden": true
+					})
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogPortal, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay, { className: "fixed inset-0 z-50 bg-bg/80" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+				className: "fixed top-1/2 left-1/2 z-50 max-h-[85dvh] w-[min(100%-2rem,36rem)] -translate-x-1/2 -translate-y-1/2 overflow-auto rounded-lg border border-border bg-surface p-6",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-start justify-between gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, {
+							className: "text-lg font-semibold text-fg",
+							children: "How readings are labeled"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogClose, {
+							className: "grid size-11 place-items-center rounded-md text-muted hover:bg-raised",
+							"aria-label": "Close",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
+								className: "size-4",
+								"aria-hidden": true
+							})
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, {
+						className: "mt-2 text-sm text-muted",
+						children: "DIPRAP separates what you typed from what a model suggests and from what was actually measured."
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+						className: "mt-4 space-y-3 text-sm text-muted",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-fg",
+								children: "User-provided text."
+							}), " The lines you pasted. The lab does not download lyrics."] }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-fg",
+								children: "Text estimate."
+							}), " Spelling groups, repeated words, punctuation, and an English syllable guess."] }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-fg",
+								children: "Model interpretation."
+							}), " A reading you request. It can be useful and still be wrong."] }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-fg",
+								children: "Measured."
+							}), " Only facts taken from an audio file you attach, such as duration."] }),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-fg",
+								children: "Unavailable."
+							}), " Tempo, breath timing, and verified pronunciation are not invented."] })
+						]
+					})
+				]
+			})] })] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+				to: "/settings",
+				"aria-label": "Settings",
+				className: "grid size-11 place-items-center rounded-md text-muted hover:bg-raised hover:text-fg",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Settings, {
+					className: "size-5",
+					"aria-hidden": true
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+				to: "/settings",
+				"aria-label": `${displayName}, open settings`,
+				className: "rounded-full",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrandInitials, { name: displayName })
+			})
+		]
+	});
+}
+function AppShell({ children }) {
+	const collapsed = useLabStore((state) => state.sidebarCollapsed);
+	const [mobileOpen, setMobileOpen] = (0, import_react.useState)(false);
+	const pathname = useRouterState({ select: (state) => state.location.pathname });
+	(0, import_react.useEffect)(() => {
+		setMobileOpen(false);
+	}, [pathname]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "flex h-dvh overflow-hidden bg-bg text-fg",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+				href: "#main",
+				className: "sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-fg",
+				children: "Skip to content"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "hidden md:flex",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sidebar, { collapsed })
+			}),
+			mobileOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "fixed inset-0 z-40 md:hidden",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+					type: "button",
+					className: "absolute inset-0 bg-bg/70",
+					"aria-label": "Close navigation",
+					onClick: () => setMobileOpen(false)
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "relative h-full",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sidebar, {
+						collapsed: false,
+						mobile: true,
+						onNavigate: () => setMobileOpen(false)
+					})
+				})]
+			}) : null,
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex min-w-0 flex-1 flex-col",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Topbar, { onMenu: () => setMobileOpen(true) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
+					id: "main",
+					className: "min-h-0 flex-1 overflow-auto",
+					children
+				})]
+			})
+		]
+	});
+}
+/**
+* App-wide client provider mounted once near the root (in `src/routes/__root.tsx`):
+*
+*   <AuthProvider><Outlet /></AuthProvider>
+*
+* Better Auth's React client (`@/lib/auth/client`) needs NO context provider —
+* its `useSession()` works standalone — so this is a passthrough today. It's
+* kept as the single, stable mount point for any future client-side providers
+* (e.g. a toast or theme provider) without churning the root shell.
+*/
+function AuthProvider({ children }) {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children });
+}
+var CONNECTOR_TOKEN_READY_EVENT = "grok:connector-token-ready";
+function isGrokEmbedderOrigin(origin) {
+	try {
+		const url = new URL(origin);
+		if (url.protocol !== "https:" && url.protocol !== "http:") return false;
+		const host = url.hostname.toLowerCase();
+		if (host === "grok.com" || host.endsWith(".grok.com")) return true;
+		if (host === "localhost" || host === "127.0.0.1" || host === "[::1]") return true;
+		return false;
+	} catch {
+		return false;
+	}
+}
+function isSandboxPreviewGuestHost(hostname) {
+	const host = hostname.toLowerCase();
+	return host === "grok-sandbox.com" || host.endsWith(".grok-sandbox.com");
+}
+function isRemintPreviewPair(guestHost, parentHost) {
+	const guest = guestHost.toLowerCase();
+	const parent = parentHost.toLowerCase();
+	const i = guest.indexOf(".preview.");
+	if (i <= 0) return false;
+	const label = guest.slice(0, i);
+	const rest = guest.slice(i + 9);
+	if (label.includes(".") || !rest.includes(".")) return false;
+	return parent === rest || parent === `grok.${rest}`;
+}
+function resolveParentEmbedderOrigin(parentIsSelf, referrer, ancestorOrigin, guestHostname = "") {
+	if (parentIsSelf) return null;
+	for (const candidate of [referrer, ancestorOrigin ?? ""].filter(Boolean)) try {
+		const url = new URL(candidate.includes("://") ? candidate : `https://${candidate}`);
+		if (url.protocol !== "https:" && url.protocol !== "http:") continue;
+		if (isGrokEmbedderOrigin(url.origin)) return url.origin;
+		if (isSandboxPreviewGuestHost(guestHostname) || isRemintPreviewPair(guestHostname, url.hostname)) return url.origin;
+	} catch {}
+	return null;
+}
+/**
+* Guest side of the grok-web ↔ sandbox preview postMessage bridge.
+*
+* Activates only when this page is framed by an allowlisted Grok embedder.
+* Top-level runs (download/export, local `npm run dev`, deployed sites) noop.
+*/
+var PREVIEW_BRIDGE_CHANNEL = "grok-preview-bridge";
+var EnvelopeSchema = object({
+	channel: literal(PREVIEW_BRIDGE_CHANNEL),
+	version: number().int().positive(),
+	type: string().min(1)
+});
+var HelloSchema = EnvelopeSchema.extend({ type: literal("hello") });
+var NavigateSchema = EnvelopeSchema.extend({
+	type: literal("navigate"),
+	path: string().min(1)
+});
+var HistorySchema = EnvelopeSchema.extend({
+	type: literal("history"),
+	delta: union([literal(-1), literal(1)])
+});
+var ConnectorTokenReadySchema = EnvelopeSchema.extend({ type: literal("connector-token-ready") });
+function isSafeBridgePath(path) {
+	if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) return false;
+	try {
+		return new URL(path, "https://preview.invalid").origin === "https://preview.invalid";
+	} catch {
+		return false;
+	}
+}
+/**
+* Origin of the Grok embedder framing this page, or null when the page runs
+* top-level (download/export, local `npm run dev`, deployed sites) or under a
+* non-Grok parent. Client-only; null during SSR.
+*/
+function resolveCurrentEmbedderOrigin() {
+	if (typeof window === "undefined") return null;
+	const ancestorOrigin = typeof location.ancestorOrigins !== "undefined" && location.ancestorOrigins.length > 0 ? location.ancestorOrigins[0] : null;
+	return resolveParentEmbedderOrigin(window.parent === window, document.referrer, ancestorOrigin, window.location.hostname);
+}
+/**
+* Install host↔guest messaging. Returns a dispose function.
+* Noops (returns a no-op dispose) when not embedded under a Grok parent.
+*/
+function installPreviewHostBridge(options = {}) {
+	const parentOrigin = resolveCurrentEmbedderOrigin();
+	if (parentOrigin === null) return () => {};
+	const ROOT_STATE_KEY = "__grokPreviewBridgeRoot";
+	const originalPushState = window.history.pushState.bind(window.history);
+	const originalReplaceState = window.history.replaceState.bind(window.history);
+	const isAtHistoryRoot = () => {
+		const state = window.history.state;
+		return Boolean(state && typeof state === "object" && state[ROOT_STATE_KEY] === true);
+	};
+	try {
+		const current = window.history.state;
+		if (!(current !== null && typeof current === "object" && Object.prototype.hasOwnProperty.call(current, ROOT_STATE_KEY))) {
+			const isRoot = window.history.length <= 1;
+			originalReplaceState(current && typeof current === "object" ? {
+				...current,
+				[ROOT_STATE_KEY]: isRoot
+			} : { [ROOT_STATE_KEY]: isRoot }, "", window.location.href);
+		}
+	} catch {}
+	const post = (message) => {
+		window.parent.postMessage(message, parentOrigin);
+	};
+	const reportLocation = () => {
+		post({
+			channel: PREVIEW_BRIDGE_CHANNEL,
+			version: 1,
+			type: "location",
+			path: window.location.pathname || "/",
+			search: window.location.search,
+			hash: window.location.hash
+		});
+	};
+	const reportRoutes = () => {
+		const paths = options.getRoutePaths?.() ?? [];
+		post({
+			channel: PREVIEW_BRIDGE_CHANNEL,
+			version: 1,
+			type: "routes",
+			paths
+		});
+	};
+	const defaultNavigate = (path) => {
+		if (!isSafeBridgePath(path)) return;
+		try {
+			const url = new URL(path, window.location.origin);
+			if (url.origin !== window.location.origin) return;
+			const next = `${url.pathname}${url.search}${url.hash}`;
+			window.history.pushState(window.history.state, "", next);
+			window.dispatchEvent(new PopStateEvent("popstate", { state: window.history.state }));
+		} catch {}
+	};
+	const navigate = (path) => {
+		if (!isSafeBridgePath(path)) return;
+		if (options.navigate) {
+			options.navigate(path);
+			return;
+		}
+		defaultNavigate(path);
+	};
+	const announce = () => {
+		reportLocation();
+		reportRoutes();
+		post({
+			channel: PREVIEW_BRIDGE_CHANNEL,
+			version: 1,
+			type: "ready"
+		});
+	};
+	const onHello = (data) => {
+		if (!HelloSchema.safeParse(data).success) return;
+		announce();
+	};
+	const onNavigate = (data) => {
+		const parsed = NavigateSchema.safeParse(data);
+		if (!parsed.success) return;
+		navigate(parsed.data.path);
+		queueMicrotask(reportLocation);
+	};
+	const onHistory = (data) => {
+		const parsed = HistorySchema.safeParse(data);
+		if (!parsed.success) return;
+		if (parsed.data.delta === -1 && isAtHistoryRoot()) return;
+		window.history.go(parsed.data.delta);
+	};
+	const onConnectorTokenReady = (data) => {
+		if (!ConnectorTokenReadySchema.safeParse(data).success) return;
+		window.dispatchEvent(new Event(CONNECTOR_TOKEN_READY_EVENT));
+	};
+	const hostMessageHandlers = /* @__PURE__ */ new Map([
+		["hello", onHello],
+		["navigate", onNavigate],
+		["history", onHistory],
+		["connector-token-ready", onConnectorTokenReady]
+	]);
+	const onMessage = (event) => {
+		if (event.source !== window.parent) return;
+		if (event.origin !== parentOrigin) return;
+		const envelope = EnvelopeSchema.safeParse(event.data);
+		if (!envelope.success || envelope.data.version !== 1) return;
+		hostMessageHandlers.get(envelope.data.type)?.(event.data);
+	};
+	const onPopState = () => {
+		reportLocation();
+	};
+	const onHashChange = () => {
+		reportLocation();
+	};
+	window.history.pushState = (data, unused, url) => {
+		const next = data && typeof data === "object" ? {
+			...data,
+			[ROOT_STATE_KEY]: false
+		} : data;
+		originalPushState(next, unused, url);
+		reportLocation();
+	};
+	window.history.replaceState = (data, unused, url) => {
+		const next = isAtHistoryRoot() ? {
+			...data && typeof data === "object" ? data : {},
+			[ROOT_STATE_KEY]: true
+		} : data;
+		originalReplaceState(next, unused, url);
+		reportLocation();
+	};
+	window.addEventListener("message", onMessage);
+	window.addEventListener("popstate", onPopState);
+	window.addEventListener("hashchange", onHashChange);
+	announce();
+	return () => {
+		window.removeEventListener("message", onMessage);
+		window.removeEventListener("popstate", onPopState);
+		window.removeEventListener("hashchange", onHashChange);
+		window.history.pushState = originalPushState;
+		window.history.replaceState = originalReplaceState;
+	};
+}
+/** Collect static path patterns from a TanStack route tree (best-effort). */
+function collectRoutePathsFromTree(routeTree) {
+	const paths = /* @__PURE__ */ new Set();
+	const walk = (node) => {
+		if (!node || typeof node !== "object") return;
+		const record = node;
+		const full = typeof record.fullPath === "string" ? record.fullPath : typeof record.path === "string" ? record.path : null;
+		if (full !== null && full !== "") paths.add(full.startsWith("/") ? full : `/${full}`);
+		else if (full === "") paths.add("/");
+		const children = record.children;
+		if (Array.isArray(children)) for (const child of children) walk(child);
+		else if (children && typeof children === "object") for (const child of Object.values(children)) walk(child);
+	};
+	walk(routeTree);
+	return [...paths];
+}
+/**
+* Mount once in `__root.tsx` so the Grok preview chrome can drive navigation
+* (and later receive registered routes). Noops when the app is not embedded.
+*/
+function PreviewHostBridge() {
+	const router = useRouter();
+	(0, import_react.useEffect)(() => {
+		return installPreviewHostBridge({
+			navigate: (path) => {
+				router.history.push(path);
+			},
+			getRoutePaths: () => collectRoutePathsFromTree(router.routeTree)
+		});
+	}, [router]);
+	return null;
+}
+var styles_default = "/assets/styles-Cr2wg3c8.css";
+var APP_NAME = "DIPRAP";
+var Route$8 = createRootRoute({
+	head: () => ({
+		meta: [
+			{ charSet: "utf-8" },
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1"
+			},
+			{ title: APP_NAME },
+			{
+				name: "description",
+				content: "DIPRAP is a rap lyrics and song analysis lab for meaning, rhyme, and flow."
+			},
+			{
+				name: "theme-color",
+				content: "#0d0d0f"
+			}
+		],
+		links: [
+			{
+				rel: "icon",
+				type: "image/svg+xml",
+				href: "/favicon.svg"
+			},
+			{
+				rel: "preconnect",
+				href: "https://fonts.googleapis.com"
+			},
+			{
+				rel: "preconnect",
+				href: "https://fonts.gstatic.com",
+				crossOrigin: "anonymous"
+			},
+			{
+				rel: "stylesheet",
+				href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap"
+			},
+			{
+				rel: "stylesheet",
+				href: styles_default
+			},
+			{
+				rel: "manifest",
+				href: "/__grok/manifest.webmanifest"
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/__grok/icon-180.png"
+			}
+		]
+	}),
+	component: () => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("html", {
+		lang: "en",
+		suppressHydrationWarning: true,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("head", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HeadContent, {}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("body", { children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PreviewHostBridge, {}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AuthProvider, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AppShell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster, { theme: "dark" })] }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Scripts, {})
+		] })]
+	})
+});
+var $$splitComponentImporter$7 = () => import("./routes-BNtAXsI5.mjs");
+var Route$7 = createFileRoute("/")({ component: lazyRouteComponent($$splitComponentImporter$7, "component") });
+var $$splitComponentImporter$6 = () => import("./analyze-BpG9LdxG.mjs");
+var Route$6 = createFileRoute("/analyze")({
+	validateSearch: (search) => {
+		const view = search.view;
+		if (typeof view === "string" && ANALYSIS_VIEWS.includes(view)) return { view };
+		return { view: "overview" };
+	},
+	head: () => ({ meta: [{ title: "Analysis · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$6, "component")
+});
+var $$splitComponentImporter$5 = () => import("./flow-lab-Bc-g22Tb.mjs");
+var Route$5 = createFileRoute("/flow-lab")({
+	head: () => ({ meta: [{ title: "Flow & Cadence · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$5, "component")
+});
+var $$splitComponentImporter$4 = () => import("./practice-C_ehr-b0.mjs");
+var Route$4 = createFileRoute("/practice")({
+	head: () => ({ meta: [{ title: "Practice Lab · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$4, "component")
+});
+var $$splitComponentImporter$3 = () => import("./projects-DbjUyFOZ.mjs");
+var Route$3 = createFileRoute("/projects")({
+	head: () => ({ meta: [{ title: "My Projects · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$3, "component")
+});
+var $$splitComponentImporter$2 = () => import("./rhyme-lab-C67lzZVE.mjs");
+var Route$2 = createFileRoute("/rhyme-lab")({
+	head: () => ({ meta: [{ title: "Rhyme Lab · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$2, "component")
+});
+var $$splitComponentImporter$1 = () => import("./search-CXZTvQQX.mjs");
+var Route$1 = createFileRoute("/search")({
+	head: () => ({ meta: [{ title: "Find a Song · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter$1, "component")
+});
+var $$splitComponentImporter = () => import("./settings-BL2Z9Cjp.mjs");
+var Route = createFileRoute("/settings")({
+	head: () => ({ meta: [{ title: "Settings · DIPRAP" }] }),
+	component: lazyRouteComponent($$splitComponentImporter, "component")
+});
+var rootRouteChildren = {
+	IndexRoute: Route$7.update({
+		id: "/",
+		path: "/",
+		getParentRoute: () => Route$8
+	}),
+	AnalyzeRoute: Route$6.update({
+		id: "/analyze",
+		path: "/analyze",
+		getParentRoute: () => Route$8
+	}),
+	FlowLabRoute: Route$5.update({
+		id: "/flow-lab",
+		path: "/flow-lab",
+		getParentRoute: () => Route$8
+	}),
+	PracticeRoute: Route$4.update({
+		id: "/practice",
+		path: "/practice",
+		getParentRoute: () => Route$8
+	}),
+	ProjectsRoute: Route$3.update({
+		id: "/projects",
+		path: "/projects",
+		getParentRoute: () => Route$8
+	}),
+	RhymeLabRoute: Route$2.update({
+		id: "/rhyme-lab",
+		path: "/rhyme-lab",
+		getParentRoute: () => Route$8
+	}),
+	SearchRoute: Route$1.update({
+		id: "/search",
+		path: "/search",
+		getParentRoute: () => Route$8
+	}),
+	SettingsRoute: Route.update({
+		id: "/settings",
+		path: "/settings",
+		getParentRoute: () => Route$8
+	})
+};
+var routeTree = Route$8._addFileChildren(rootRouteChildren)._addFileTypes();
+var router_exports = /* @__PURE__ */ __exportAll({ getRouter: () => getRouter });
+function getRouter() {
+	return createRouter({
+		routeTree,
+		rewrite: previewPathRewrite(),
+		defaultErrorComponent: AppErrorComponent,
+		scrollRestoration: true
+	});
+}
+//#endregion
+export { validateArtist as a, validateUrl as c, formatDuration as d, formatSampleRate as f, useLabStore as i, getAiAvailability as l, Route$6 as n, validateLyrics as o, initials as p, useActiveProject as r, validateTitle as s, router_exports as t, cn as u };
